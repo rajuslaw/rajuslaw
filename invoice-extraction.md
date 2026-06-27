@@ -1,12 +1,31 @@
-# AI-Powered Invoice Extraction — Document Intelligence
+# 🧾 AI-Powered Invoice Extraction — Document Intelligence
 
-> **Role:** Technical Lead / Principal Engineer — owned the solution and led delivery.
-> **Type:** Production GenAI system (sanitized public case study). Internal app and vendor
-> API names generalized; architecture and decisions are my own.
+![Role](https://img.shields.io/badge/Role-Technical%20Lead%20%2F%20Principal-0A66C2)
+![Domain](https://img.shields.io/badge/Domain-Finance%20Ops-444)
+![Pattern](https://img.shields.io/badge/Pattern-OCR%20%2B%20LLM%20Extraction-1f6feb)
+![HITL](https://img.shields.io/badge/Design-Human--in--the--Loop-2da44e)
 
-An OCR + LLM pipeline that **auto-populates invoice fields** in an internal invoicing
-application, replacing slow, error-prone manual data entry. Because vendors use wildly
-different invoice formats, LLMs — not brittle regex — handle the variety.
+> An OCR + LLM pipeline that **auto-populates invoice fields** in an internal invoicing
+> application, replacing slow, error-prone manual data entry. Because vendors use wildly different
+> invoice formats, LLMs — not brittle regex — interpret the fields.
+>
+> *Sanitized case study. Internal application and vendor-service names are generalized; the
+> architecture and engineering decisions are my own.*
+
+[← Back to profile](./README.md)
+
+---
+
+## Contents
+
+- [1. The problem](#1-the-problem)
+- [2. Why AI instead of traditional OCR](#2-why-ai-instead-of-traditional-ocr)
+- [3. Architecture](#3-architecture)
+- [4. Functional highlights](#4-functional-highlights)
+- [5. Success metrics](#5-success-metrics)
+- [6. Design decisions & trade-offs](#6-design-decisions--trade-offs)
+- [7. Design FAQ](#7-design-faq)
+- [My role](#my-role)
 
 ---
 
@@ -23,10 +42,13 @@ Manual entry of invoice metadata into the payment-request workflow was slow and 
 ## 2. Why AI instead of traditional OCR
 
 - Vendors use varied invoice formats and inconsistent field labels.
-- Plain OCR extracts text but **can't reliably identify which value is which field** using regex.
-- An LLM **understands context** and extracts structured data even from formats it hasn't seen before.
+- Plain OCR extracts text but **can't reliably identify which value belongs to which field** using
+  regex.
+- An **LLM understands context** and extracts structured data even from formats it hasn't seen
+  before.
 
-The pipeline therefore pairs OCR (read the pixels) with an LLM (interpret the fields).
+The pipeline therefore pairs OCR (read the pixels) with an LLM (interpret the fields), delivered
+through a **third-party OCR + LLM extraction service**.
 
 ---
 
@@ -35,7 +57,7 @@ The pipeline therefore pairs OCR (read the pixels) with an LLM (interpret the fi
 ```mermaid
 flowchart TB
     subgraph Phase1[Phase 1 — Inline auto-fill]
-        U1[User uploads invoice<br/>PDF / image] --> EX1[Extraction API<br/>OCR + LLM]
+        U1[User uploads invoice<br/>PDF / image] --> EX1[OCR + LLM<br/>extraction service]
         EX1 --> F1[Structured fields:<br/>invoice no, date, amount, PO date]
         F1 --> FORM[Auto-fill PRF form]
         FORM --> V1[User verifies & submits]
@@ -43,25 +65,26 @@ flowchart TB
     subgraph Phase2[Phase 2 — Email-based draft]
         MBX[Shared mailbox] --> JOB[Background job<br/>monitors inbox]
         JOB --> AT[Extract invoice attachment]
-        AT --> EX2[Extraction API<br/>OCR + LLM]
+        AT --> EX2[OCR + LLM<br/>extraction service]
         EX2 --> DRAFT[Create draft PRF]
         DRAFT --> NOTIFY[Notify invoicing team for review]
     end
 ```
 
 ### Phase 1 — Inline PRF auto-fill
-1. User uploads an invoice PDF/image in the app.
-2. File goes to the extraction API (OCR + LLM).
-3. API returns structured fields: invoice number, date, amount, PO date.
-4. Fields are auto-filled into the PRF form **for human verification** before submit.
+1. The user uploads an invoice PDF/image in the app.
+2. The file is sent to the extraction service (OCR + LLM).
+3. The service returns structured fields: invoice number, date, amount, PO date.
+4. Fields are auto-filled into the PRF form **for human verification** before submission.
 
 ### Phase 2 — Email-based draft PRF
 1. A background job monitors a shared mailbox.
-2. It extracts the invoice attachment and sends it to the extraction API.
-3. A **draft PRF** is created in the invoicing app.
+2. It extracts the invoice attachment and sends it to the extraction service.
+3. A **draft PRF** is created in the invoicing application.
 4. A notification email routes it to the invoicing team for review.
 
-Both phases keep a **human in the loop** — the AI accelerates, the human approves.
+Both phases keep a **human in the loop** — the AI accelerates, the human approves. Invoice errors
+are expensive, so approval authority stays with people.
 
 ---
 
@@ -75,7 +98,7 @@ Both phases keep a **human in the loop** — the AI accelerates, the human appro
 
 ---
 
-## 5. Success metrics (targets)
+## 5. Success metrics
 
 | Metric | Target |
 |---|---|
@@ -84,8 +107,8 @@ Both phases keep a **human in the loop** — the AI accelerates, the human appro
 | Drop in rejections | ≥ 50% |
 | Draft PRFs created from email | ≥ 30% |
 
-> These were the program's success criteria. Replace with measured production numbers
-> once you're cleared to share them — a real number here is worth a lot in interviews.
+> These were the program's success criteria. *(Replace with measured production numbers once
+> cleared to share — a real figure here is worth a lot.)*
 
 ---
 
@@ -95,15 +118,45 @@ Both phases keep a **human in the loop** — the AI accelerates, the human appro
 |---|---|---|
 | Extraction approach | OCR + LLM (not regex) | Generalizes across unseen vendor formats |
 | Human review | Always-on, both phases | Invoice errors are costly; keep approval with humans |
-| Two entry points | Upload + mailbox | Meets users where they already work |
-| Output | Structured fields into existing PRF form | Drops into the current workflow, no retraining users |
+| Two entry points | Upload + shared mailbox | Meets users where they already work |
+| Output | Structured fields into the existing PRF form | Drops into the current workflow; no user retraining |
 
 ---
 
-## 7. My role
+## 7. Design FAQ
 
-I **led** the design and delivery: the OCR+LLM extraction approach, the two-phase rollout
-(inline auto-fill, then email-driven drafts), the human-in-the-loop review workflow, and the
-success-metric framework.
+<details>
+<summary><b>Why not just train a template per vendor?</b></summary>
 
-`OCR` · `LLM extraction` · `document AI` · `human-in-the-loop` · `email automation` · `Python`
+Per-vendor templates don't scale — every new vendor or format change means new rules and ongoing
+maintenance. An LLM generalizes across formats from context, so onboarding a new vendor needs no
+new code.
+</details>
+
+<details>
+<summary><b>How do you prevent bad extractions from causing wrong payments?</b></summary>
+
+Human-in-the-loop by design. Phase 1 auto-fills but requires the user to verify and submit; Phase 2
+creates only a *draft* PRF that the invoicing team reviews. The AI never finalizes a payment record
+on its own.
+</details>
+
+<details>
+<summary><b>How is accuracy measured?</b></summary>
+
+Against the success criteria above — auto-fill accuracy, PRF creation time, and rejection rate —
+tracked over the rollout and compared to the manual-entry baseline.
+</details>
+
+---
+
+## My role
+
+I **led** the design and delivery: the OCR + LLM extraction approach, the two-phase rollout (inline
+auto-fill, then email-driven drafts), the human-in-the-loop review workflow, and the success-metric
+framework.
+
+**Stack:** `OCR` · `LLM extraction` · `document AI` · `human-in-the-loop` · `email automation` ·
+`Python`
+
+[← Back to profile](./README.md)
