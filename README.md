@@ -1,15 +1,4 @@
-<!--
-HOW TO USE
-1. Create a PUBLIC repo named EXACTLY your GitHub username → it renders on your profile.
-2. Put this README.md at the root. Replace every <PLACEHOLDER>.
-3. SANITIZE: these are employer projects. Before publishing, remove internal/vendor
-   names (SAP Ariba, PeopleSoft, INVTR, the specific vendor APIs) and confirm nothing
-   breaches your NDA. The architecture and your decisions are yours to talk about;
-   proprietary identifiers are not. Numbers below are from your decks — keep only what
-   you're cleared to share, mark estimates as "target" if not yet measured in prod.
--->
-
-<h1 align="center">Hi, I'm <NAME> 👋</h1>
+<h1 align="center">Hi, I'm Raju Singh 👋</h1>
 
 <p align="center">
   <b>Principal Engineer — GenAI · Agentic AI · RAG · ML Systems</b><br>
@@ -19,18 +8,17 @@ HOW TO USE
 </p>
 
 <p align="center">
-  <a href="https://linkedin.com/in/<HANDLE>">LinkedIn</a> ·
-  <a href="<BLOG_OR_SITE_URL>">Writing</a> ·
   <a href="mailto:rajuslaw@gmail.com">Email</a>
+  <!-- Add when ready: LinkedIn, personal site/blog -->
 </p>
 
 ---
 
 ## 🧭 About
 
-Principal/Staff-level engineer currently **leading** GenAI systems in enterprise supply-chain
-and finance operations. I work end to end — data ingestion, retrieval architecture, agent
-design, guardrails, failover, and cost/latency optimization — and I lead the teams that ship them.
+Principal/Staff-level engineer **leading** GenAI systems in enterprise supply-chain and finance
+operations. I work end to end — data ingestion, retrieval architecture, agent design, guardrails,
+failover, and cost/latency optimization — and I lead the teams that ship them.
 
 - 🔭 Leading: an AI contract-intelligence agent giving procurement teams a single source of truth
 - 🛠️ Focus: RAG, agentic workflows, document AI (OCR + LLM), evals, guardrails, LLM infra
@@ -40,23 +28,23 @@ design, guardrails, failover, and cost/latency optimization — and I lead the t
 
 ## 🚀 Selected work
 
-> Case studies below are sanitized summaries of production systems I've led. Internal/vendor
-> names removed. Architecture diagrams and writeups: see the linked repos/posts.
+> Sanitized summaries of production systems I've led. Internal/vendor names generalized; the
+> architecture and engineering decisions are my own. Click through for full case studies with
+> architecture diagrams.
 
 ### 🔍 [Contract Intelligence System](./contract-intelligence.md) — Enterprise RAG agent *(Lead)*
 A natural-language agent that unifies contract data fragmented across four enterprise systems
 (contracts, ERP/payments, invoicing, regional contracts) so procurement can ask *"What discount
 does Vendor A offer on electronics?"* and get cited answers in seconds.
 
-**Architecture I designed & led:**
-- **Two-flow design** — batch ingestion (S3 raw zone → ETL) separated from the query pipeline.
-- **ETL:** metadata extraction → PII scan/mask (tokenization) → classification → MD5-hash dedup → change-data-capture that keeps the vector store in sync on update/delete.
+- **Two-flow design** — batch ingestion (raw landing zone → ETL) separated from the query pipeline.
+- **ETL:** metadata extraction → PII scan/mask (tokenization) → classification → content-hash dedup → change-data-capture that keeps the vector store in sync on update/delete.
 - **Hybrid retrieval in parallel:** keyword (Postgres metadata, exact) + semantic (vector DB with **RBAC/region/vendor metadata pre-filtering at query time**), merged through a **self-hosted cross-encoder reranker** (10–50ms, no API cost).
 - **Guardrails:** input PII/security checks; **conditional context-grounding** (cosine-sim hallucination check that runs only when reranker confidence < 95%, saving 200–400ms on confident answers); output PII + secret-leak validation.
-- **LLM routing via LiteLLM:** primary model with same-provider and cross-provider failover; tested across models on an eval set.
-- **Resiliency:** cache fallback (hash-based invalidation, TTL), weekly data-quality reconciliation across store/index/metadata, full audit logging & telemetry.
+- **LLM routing via LiteLLM:** primary model with same-provider and cross-provider failover.
+- **Resiliency:** cache fallback (hash-based invalidation), weekly data-quality reconciliation, full audit logging & telemetry.
 
-`Python` · `RAG` · `Postgres` · `Pinecone` · `cross-encoder reranking` · `LiteLLM` · `Presidio` · `Kubernetes`
+`Python` · `RAG` · `hybrid retrieval` · `cross-encoder reranking` · `vector DB` · `Postgres` · `LiteLLM` · `Presidio` · `Kubernetes`
 
 ### 🧾 [AI-Powered Invoice Extraction](./invoice-extraction.md) — Document intelligence *(Lead)*
 OCR + LLM pipeline that auto-populates invoice fields in an internal invoicing app, replacing
@@ -64,7 +52,7 @@ slow, error-prone manual entry. LLMs (not regex) handle the wide variety of vend
 
 - **Phase 1:** user uploads invoice → API extracts invoice #, date, amount, PO date → auto-fills form for verification.
 - **Phase 2:** background job monitors a shared mailbox → extracts attachments → creates draft records → routes to the team for review.
-- **Targets:** ≥90% auto-fill accuracy · ≥60% faster record creation · ≥50% fewer rejections · ≥30% of records drafted from email.
+- **Targets:** ≥90% auto-fill accuracy · ≥60% faster record creation · ≥50% fewer rejections.
 
 `OCR` · `LLM extraction` · `document AI` · `human-in-the-loop` · `Python`
 
@@ -80,23 +68,26 @@ automation, and replies with a professional, generated response.
 
 ---
 
-## 🌱 Open source
-<!-- Land 2–3 real merged PRs (LangChain, LlamaIndex, RAGAS, Presidio, LiteLLM are natural fits given your stack). Delete this section until you have one. -->
-- [<repo> #<PR>](<URL>) — <one-line description>
-
-## 📝 Writing
-<!-- Turn each case study's hardest problem into one post. Strong principal-level talking points. -->
-- [Conditional grounding: cutting hallucination-check latency without losing safety](<URL>)
-- [Designing hybrid RAG with query-time RBAC filtering](<URL>)
-- [LLM router failover patterns with LiteLLM](<URL>)
-
----
-
 ## 🧰 Tech
 
 **GenAI/LLM:** RAG (hybrid + reranking) · agents & tool-use · document AI (OCR+LLM) · evals · guardrails (Presidio) · prompt/context engineering
-**Infra:** LiteLLM routing/failover · vector DBs (Pinecone) · Postgres · caching/CDC · Kubernetes
+**Infra:** LiteLLM routing/failover · vector DBs · Postgres · caching/CDC · Kubernetes
 **Lang/Tools:** Python · LangChain · Playwright · Microsoft Graph · Docker · CI/CD · observability
+
+---
+
+## 🌱 Open source
+
+_Targeting contributions to the production tools I work with — LiteLLM, Microsoft Presidio,
+RAGAS. Merged PRs will be linked here._
+
+## 📝 Writing
+
+Technical deep-dives in progress, drawn from the systems above:
+
+- Conditional grounding: cutting hallucination-check latency without losing safety
+- Hybrid RAG with query-time RBAC filtering (why post-retrieval filtering is wrong)
+- LLM router failover patterns with LiteLLM
 
 ---
 
