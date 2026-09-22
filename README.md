@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <a href="mailto:rajuslaw@gmail.com">Email</a>
+  <a href="mailto:rks.dgp@gmail.com">Email</a>
   <!-- Add when ready: LinkedIn, personal site/blog -->
 </p>
 
