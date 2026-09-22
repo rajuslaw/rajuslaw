@@ -79,7 +79,7 @@ automation, and replies with a professional, generated response.
 ## 🌱 Open source
 
 _Targeting contributions to the production tools I work with — LiteLLM, Microsoft Presidio,
-RAGAS. Merged PRs will be linked here._
+RAGAS. 
 
 ## 📝 Writing
 
