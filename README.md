@@ -1,10 +1,7 @@
 <h1 align="center">Hi, I'm Raju Singh 👋</h1>
 
 <p align="center">
-  <b>Principal Engineer — GenAI · Agentic AI · RAG · ML Systems</b><br>
-  I architect and lead production LLM systems: enterprise RAG over fragmented data,
-  document-intelligence pipelines, and autonomous agents — with the evals, guardrails,
-  and resiliency to run them reliably.
+  <b>Principal / Staff Software Engineer | GenAI | RAG | AI Agents | Distributed Systems.
 </p>
 
 <p align="center">
